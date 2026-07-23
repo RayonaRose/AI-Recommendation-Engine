@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Recommendation Engine</title>
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --text: #1e293b;
+            --border: #cbd5e1;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: var(--text);
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .container {
+            width: 100%;
+            max-width: 700px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+        }
+        h1 {
+            margin-top: 0;
+            font-size: 26px;
+            color: var(--primary);
+            text-align: center;
+        }
+        p.subtitle {
+            text-align: center;
+            color: #64748b;
+            margin-bottom: 24px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 16px;
+            box-sizing: border-box;
+            background-color: #fff;
+        }
+        textarea {
+            resize: vertical;
+            height: 100px;
+        }
+        button {
+            width: 100%;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 14px;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        button:hover {
+            background-color: var(--primary-hover);
+        }
+        button:disabled {
+            background-color: #94a3b8;
+            cursor: not-allowed;
+        }
+        .result-container {
+            margin-top: 30px;
+            background: #f1f5f9;
+            border-radius: 8px;
+            padding: 20px;
+            min-height: 120px;
+            white-space: pre-wrap;
+            line-height: 1.6;
+            border: 1px solid #e2e8f0;
+        }
+        .result-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #334155;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>AI Recommendation Engine</h1>
+        <p class="subtitle">Discover personalized suggestions powered by Claude AI</p>
+        
+        <div class="form-group">
+            <label for="category">Recommendation Category</label>
+            <select id="category">
+                <option value="Career Paths & Upskilling">Career Paths & Upskilling</option>
+                <option value="Books & Literature">Books & Literature</option>
+                <option value="Movies & TV Shows">Movies & TV Shows</option>
+                <option value="Travel Destinations">Travel Destinations</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="preferences">Your Preferences & Interests</label>
+            <textarea id="preferences" placeholder="e.g., I love working with data, Python, and statistics..."></textarea>
+        </div>
+
+        <button id="submitBtn" onclick="getRecommendations()">Get Recommendations</button>
+
+        <div class="result-container">
+            <div class="result-title">Your Personalized Results:</div>
+            <div id="output">Your recommendations will appear here...</div>
+        </div>
+    </div>
+
+    <script>
+        async function getRecommendations() {
+            const category = document.getElementById('category').value;
+            const preferences = document.getElementById('preferences').value.trim();
+            const outputDiv = document.getElementById('output');
+            const submitBtn = document.getElementById('submitBtn');
+
+            if (!preferences) {
+                alert('Please enter your preferences!');
+                return;
+            }
+
+            outputDiv.textContent = 'Generating your personalized suggestions...';
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Generating...';
+
+            try {
+                const response = await fetch('/api/get-recommendations', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ category, preferences })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error || 'Server error');
+                }
+
+                outputDiv.textContent = data.result;
+            } catch (error) {
+                outputDiv.textContent = 'Error: ' + error.message;
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Get Recommendations';
+            }
+        }
+    </script>
+</body>
+</html>
